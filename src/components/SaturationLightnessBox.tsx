@@ -13,6 +13,10 @@ export const SaturationLightnessBox = ({}: {}) => {
     const { clientX, clientY } = event;
     const { left, top, width, height } =
       event.currentTarget.getBoundingClientRect();
+    // if mouse is outside of the box, return early
+    if (clientX < left || clientX > left + width || clientY < top || clientY > top + height) {
+      return;
+    }
     const x = clientX - left;
     const y = clientY - top;
     const s = x / width;
@@ -44,11 +48,26 @@ export const SaturationLightnessBox = ({}: {}) => {
       onMouseUp={mouseUpEvent}
       onMouseMove={mouseMoveEvent}
     >
+      <SaturationLightnessIndicator  style={{ "--hue": hue + "deg", "--saturation": saturation + "%", "--lightness": lightness + "%" }}/>
       <SaturationFilter />
-      <LightnessFilter style={{ "--hue": hue + "deg" } as CSSProperties} />
+      <LightnessFilter style={{ "--hue": hue + "deg" }} />
     </BoxWrapper>
   );
 };
+
+const SaturationLightnessIndicator = styled.div`
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid black;
+  background-color: hsl(var(--hue), var(--saturation), var(--lightness));
+  z-index: 1;
+  transform: translate(-15px, 15px);
+  bottom: var(--lightness);
+  left: var(--saturation);
+  box-shadow: white 0px 0px 0px 2px inset;
+`
 
 const BoxWrapper = styled.div`
   width: 300px;
