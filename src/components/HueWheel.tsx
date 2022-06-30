@@ -50,6 +50,7 @@ export const HueWheel = ({size}:{size: number}) => {
       onMouseMove={mouseMoveEvent}
       style={{"--size": size + "px"}}
     >
+      <HueIndicator style={{"--degrees": (hue - 90) + "deg", "--hue": hue + "deg"}}/>
       <HueWheelBlockerWrapper>
         <dt>Hue</dt>
         <dd>{hue} degrees</dd>
@@ -57,6 +58,19 @@ export const HueWheel = ({size}:{size: number}) => {
     </HueWheelWrapper>
   );
 };
+
+const HueIndicator = styled.div`
+  position: absolute;
+  width: 55px;
+  height: 35px;
+  border: 4px solid black;
+  background-color: hsl(var(--hue), 100%, 50%);
+  // rotate by 90 degrees
+  transform: rotate(var(--degrees)) translate(131px, 0px);
+  transform-origin: center;
+  box-shadow: white 0px 0px 0px 2px inset;
+`;
+
 
 const HueWheelBlockerWrapper = styled.dl`
   height: calc(var(--size) - 70px);

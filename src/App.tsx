@@ -6,20 +6,40 @@ import { SaturationLightnessBox } from "./components/SaturationLightnessBox";
 // import {} from 'styled-components/cssprop'
 
 const getRandomHSL = () => {
-  const hue = Math.floor(Math.random() * 360);
-  const saturation = Math.floor(Math.random() * 100);
-  const lightness = Math.floor(Math.random() * 100);
+  const hue = Math.floor(Math.random() * 360); // 0-360deg
+  const saturation = Math.floor(Math.random() * 90 + 10); // 10-100%
+  const lightness = Math.floor(Math.random() * 80 + 10); // 10-90%
   return { hue, saturation, lightness };
 };
 
+const calculateScore = (
+  hue: number,
+  saturation: number,
+  lightness: number,
+  targetHSL: HSL
+) => {
+  // max points 10, get 1 point off for every percent or degree off hsl
+  const hueDifference = Math.abs(hue - targetHSL.hue);
+  const saturationDifference = Math.abs(saturation - targetHSL.saturation);
+  const lightnessDifference = Math.abs(lightness - targetHSL.lightness);
+  const score = Math.max(0, 10 - (hueDifference + saturationDifference + lightnessDifference));
+  return score;
+};
+
+// 0.9 = (360 - 36) / 360
+
 function App() {
+  const [score, setScore] = useState(0);
+  const [maxScore, setMaxScore] = useState(0);
   const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(100);
   const [lightness, setLightness] = useState(50);
   const [targetHSL, setTargetHSL] = useState(getRandomHSL());
   const [answerRevealed, setAnswerRevealed] = useState(false);
   // index of range 0-2 for hue, saturation, lightness, initailized randomly
-  const [shownAnswerIndex, setShownAnswerIndex] = useState(Math.floor(Math.random() * 3));
+  const [shownAnswerIndex, setShownAnswerIndex] = useState(
+    Math.floor(Math.random() * 3)
+  );
 
   const setHSL = (
     hue: number | null,
@@ -44,7 +64,10 @@ function App() {
           <SaturationLightnessBox />
         </Row>
         <Row>
-          <Column style={{ alignItems: "flex-end" }}>
+          <Column>
+            <h2>
+              Score: {score} / {maxScore}
+            </h2>
             <Row>
               <Column>
                 <h2>Your Color:</h2>
@@ -86,31 +109,57 @@ function App() {
                 <h2>Target Color:</h2>
                 <InfoWrapper>
                   <div>Hue:</div>
-                  <div>{answerRevealed || shownAnswerIndex === 0 ? targetHSL.hue : "?"}</div>
+                  <div>
+                    {answerRevealed || shownAnswerIndex === 0
+                      ? targetHSL.hue
+                      : "?"}
+                  </div>
                 </InfoWrapper>
                 <InfoWrapper>
                   <div>Saturation:</div>
-                  <div>{answerRevealed || shownAnswerIndex === 1 ? targetHSL.saturation : "?"}</div>
+                  <div>
+                    {answerRevealed || shownAnswerIndex === 1
+                      ? targetHSL.saturation
+                      : "?"}
+                  </div>
                 </InfoWrapper>
                 <InfoWrapper>
                   <div>Lightness:</div>
-                  <div>{answerRevealed || shownAnswerIndex === 2 ? targetHSL.lightness : "?"}</div>
+                  <div>
+                    {answerRevealed || shownAnswerIndex === 2
+                      ? targetHSL.lightness
+                      : "?"}
+                  </div>
                 </InfoWrapper>
               </Column>
             </Row>
           </Column>
         </Row>
         <Row>
-          <button
-            onClick={() => {
-              setTargetHSL(getRandomHSL());
-              setAnswerRevealed(false);
-              setShownAnswerIndex(Math.floor(Math.random() * 3));
-            }}
-          >
-            Next
-          </button>
-          <button onClick={() => setAnswerRevealed(true)}>Reveal Answer</button>
+          {answerRevealed ? (
+            <button
+              onClick={() => {
+                setTargetHSL(getRandomHSL());
+                setAnswerRevealed(false);
+                setShownAnswerIndex(Math.floor(Math.random() * 3));
+              }}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                // add score to current score
+                setScore(
+                  score + calculateScore(hue, saturation, lightness, targetHSL)
+                );
+                setMaxScore(maxScore + 10);
+                setAnswerRevealed(true);
+              }}
+            >
+              Reveal Answer
+            </button>
+          )}
         </Row>
         <Row style={{ gap: "0px" }}>
           <ColoredBox

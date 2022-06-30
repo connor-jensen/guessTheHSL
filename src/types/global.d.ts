@@ -6,3 +6,11 @@ declare module 'csstype' {
     [index: string]: any;
   }
 }
+
+declare global {
+  interface HSL {
+    hue: number;
+    saturation: number;
+    lightness: number;
+  }
+}
