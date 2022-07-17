@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { HSLContext } from "./HSLContext";
 import { HueWheel } from "./components/HueWheel";
 import { SaturationLightnessBox } from "./components/SaturationLightnessBox";
-// import {} from 'styled-components/cssprop'
+import useEffectOnce from "./hooks/useEffectOnce";
 
 const getRandomHSL = () => {
   const hue = Math.floor(Math.random() * 360); // 0-360deg
@@ -36,25 +36,75 @@ function App() {
   const [lightness, setLightness] = useState(50);
   const [targetHSL, setTargetHSL] = useState(getRandomHSL());
   const [answerRevealed, setAnswerRevealed] = useState(false);
+
+  // lock the values of hsl
+  const [hueLocked, setHueLocked] = useState(false);
+  const [saturationLocked, setSaturationLocked] = useState(false);
+  const [lightnessLocked, setLightnessLocked] = useState(false);
+
   // index of range 0-2 for hue, saturation, lightness, initailized randomly
-  const [shownAnswerIndex, setShownAnswerIndex] = useState(
-    Math.floor(Math.random() * 3)
-  );
+  const [shownAnswerIndex, setShownAnswerIndex] = useState(4);
 
   const setHSL = (
     hue: number | null,
     saturation: number | null,
     lightness: number | null
   ) => {
-    if (hue) setHue(hue);
-    if (saturation) setSaturation(saturation);
-    if (lightness) setLightness(lightness);
+    if (hue && !hueLocked) setHue(hue);
+    if (saturation && !saturationLocked) setSaturation(saturation);
+    if (lightness && !lightnessLocked) setLightness(lightness);
   };
 
   const contextValue = useMemo(
     () => ({ hue, saturation, lightness, setHSL }),
     [hue, saturation, lightness, setHSL]
   );
+
+  const resetRound = () => {
+    const tempTargetHSL = getRandomHSL();
+    const hslIndex = Math.floor(Math.random() * 3);
+
+    let tempHueLocked = false;
+    let tempSaturationLocked = false;
+    let tempLightnessLocked = false;
+
+    switch (hslIndex) {
+      case 0:
+        setHue(tempTargetHSL.hue);
+        setSaturation(100);
+        setLightness(50);
+        setHueLocked(true); 
+        setSaturationLocked(false);
+        setLightnessLocked(false);     
+        break;
+      case 1:
+        setSaturation(tempTargetHSL.saturation);
+        setHue(0);
+        setLightness(50);
+        setHueLocked(false);
+        setSaturationLocked(true);
+        setLightnessLocked(false);
+        break;
+      case 2:
+        setLightness(tempTargetHSL.lightness);
+        setSaturation(100);
+        setHue(0);
+        setHueLocked(false);
+        setSaturationLocked(false);
+        setLightnessLocked(true);
+        break;
+      default:
+        break;
+    }
+    setTargetHSL(tempTargetHSL);
+    setAnswerRevealed(false);
+    setShownAnswerIndex(hslIndex);
+  }
+
+
+  useEffectOnce(() => {
+    resetRound();
+  });
 
   return (
     <HSLContext.Provider value={contextValue}>
@@ -139,9 +189,7 @@ function App() {
           {answerRevealed ? (
             <button
               onClick={() => {
-                setTargetHSL(getRandomHSL());
-                setAnswerRevealed(false);
-                setShownAnswerIndex(Math.floor(Math.random() * 3));
+                resetRound();
               }}
             >
               Next
