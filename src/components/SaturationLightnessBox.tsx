@@ -3,7 +3,7 @@ import { CSSProperties } from "react";
 import styled from "styled-components";
 import { HSLContext } from "../HSLContext";
 
-export const SaturationLightnessBox = ({}: {}) => {
+export const SaturationLightnessBox = ({size}: {size: number}) => {
   const [mouseDown, setMouseDown] = React.useState(false);
   const { hue, saturation, lightness, setHSL } = React.useContext(HSLContext);
 
@@ -47,6 +47,7 @@ export const SaturationLightnessBox = ({}: {}) => {
       onMouseDown={mouseDownEvent}
       onMouseUp={mouseUpEvent}
       onMouseMove={mouseMoveEvent}
+      style={{"--size": size + 'px'}}
     >
       <SaturationLightnessIndicator  style={{ "--hue": hue + "deg", "--saturation": saturation + "%", "--lightness": lightness + "%" }}/>
       <SaturationFilter />
@@ -70,9 +71,11 @@ const SaturationLightnessIndicator = styled.div`
 `
 
 const BoxWrapper = styled.div`
-  width: 300px;
-  height: 300px;
+  width: var(--size);
+  height: var(--size);
   position: relative;
+  border: 2px solid black;
+  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.25);
 `;
 
 const SaturationFilter = styled.div`
