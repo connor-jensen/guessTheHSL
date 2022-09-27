@@ -12,9 +12,15 @@ const NumberControls = ({ currentHSL }: { currentHSL: HSL }) => {
     <Wrapper>
       <ControlWrapper>
         <Button
-          onClick={() => {
+          onMouseUp={() => {
             setHSL(hue + 1, null, null);
           }}
+          onTouchEnd={
+            (e) => {
+              e.preventDefault();
+              setHSL(hue + 1, null, null);
+            }
+          }
         >
           +
         </Button>
@@ -28,7 +34,7 @@ const NumberControls = ({ currentHSL }: { currentHSL: HSL }) => {
         </Button>
       </ControlWrapper>
       <ControlWrapper>
-      <Button
+        <Button
           onClick={() => {
             setHSL(null, saturation + 1, null);
           }}
@@ -45,7 +51,7 @@ const NumberControls = ({ currentHSL }: { currentHSL: HSL }) => {
         </Button>
       </ControlWrapper>
       <ControlWrapper>
-      <Button
+        <Button
           onClick={() => {
             setHSL(null, null, lightness + 1);
           }}
@@ -78,8 +84,10 @@ const Button = styled.button`
   box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.18);
   width: 65px;
 
-  &:hover {
-    background-color: ${COLORS.gray[700]};
+  @media (hover: hover) {
+    &:hover {
+      background-color: ${COLORS.gray[700]};
+    }
   }
 `;
 
