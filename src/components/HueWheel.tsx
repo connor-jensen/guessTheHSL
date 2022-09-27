@@ -1,14 +1,17 @@
-import * as React from "react";
-import styled from "styled-components";
-import { HSLContext } from "../HSLContext";
+import * as React from 'react';
+import styled from 'styled-components';
+import { HSLContext } from '../HSLContext';
 
-const setHueFromAngle = (event: React.MouseEvent<HTMLDivElement>, setHue: (hue: number) => void) => {
+const setHueFromAngle = (
+  event: React.MouseEvent<HTMLDivElement>,
+  setHue: (hue: number) => void
+) => {
   const div = event.currentTarget;
   const rect = div.getBoundingClientRect();
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
-  const mouseX = event.clientX;
-  const mouseY = event.clientY;
+  const  mouseX = event.clientX;
+  const  mouseY = event.clientY;
   const dx = mouseX - centerX;
   const dy = centerY - mouseY;
   let angle = -((Math.atan2(dy, dx) * 180) / Math.PI) + 90;
@@ -18,28 +21,67 @@ const setHueFromAngle = (event: React.MouseEvent<HTMLDivElement>, setHue: (hue: 
 
   // round angle to nearest integer and set state
   setHue(Math.round(angle));
-}
+};
 
-export const HueWheel = ({size}:{size: number}) => {
+const setHueFromTouchAngle = (
+  event: React.TouchEvent<HTMLDivElement>,
+  setHue: (hue: number) => void
+) => {
+  const div = event.currentTarget;
+  const rect = div.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const  mouseX = event.touches[0].clientX;
+  const  mouseY = event.touches[0].clientY;;
+  const dx = mouseX - centerX;
+  const dy = centerY - mouseY;
+  let angle = -((Math.atan2(dy, dx) * 180) / Math.PI) + 90;
+  if (angle < 0) {
+    angle += 360;
+  }
+
+  // round angle to nearest integer and set state
+  setHue(Math.round(angle));
+};
+
+export const HueWheel = ({ size }: { size: number }) => {
   const [mouseDown, setMouseDown] = React.useState(false);
   const { hue, setHSL } = React.useContext(HSLContext);
   const setHue = (hue: number) => setHSL(hue, null, null);
 
-  const mouseDownEvent = (event: React.MouseEvent<HTMLDivElement>) => {
+  const mouseDownEvent = (event: React.MouseEvent<HTMLDivElement> ) => {
     setMouseDown(true);
     // console.log("mouse down");
-    setHueFromAngle(event, (setHue));
+    setHueFromAngle(event, setHue);
   };
 
-  const mouseUpEvent = (event: React.MouseEvent<HTMLDivElement>) => {
+  const mouseUpEvent = (event: React.MouseEvent<HTMLDivElement> ) => {
     setMouseDown(false);
     // console.log("mouse up");
   };
 
-  const mouseMoveEvent = (event: React.MouseEvent<HTMLDivElement>) => {
+  const mouseMoveEvent = (event: React.MouseEvent<HTMLDivElement> ) => {
     if (mouseDown) {
       // console.log("mouse move");
       setHueFromAngle(event, setHue);
+    }
+  };
+
+  const touchStartEvent = (event: React.TouchEvent<HTMLDivElement>) => {
+    setMouseDown(true);
+    // console.log("mouse down");
+    setHueFromTouchAngle(event, setHue);
+  };
+
+  const touchEndEvent = (event: React.TouchEvent<HTMLDivElement>) => {
+    setMouseDown(false);
+    // console.log("mouse up");
+  };
+
+  const touchMoveEvent = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (mouseDown) {
+      // console.log("mouse move");
+      setHueFromTouchAngle(event, setHue);
     }
   };
 
@@ -48,9 +90,19 @@ export const HueWheel = ({size}:{size: number}) => {
       onMouseDown={mouseDownEvent}
       onMouseUp={mouseUpEvent}
       onMouseMove={mouseMoveEvent}
-      style={{"--size": size + "px"}}
+      onTouchStart={touchStartEvent}
+      onTouchEnd={touchEndEvent}
+      onTouchMove={touchMoveEvent}
+      style={{ '--size': size + 'px' }}
     >
-      <HueIndicator style={{"--degrees": (hue - 90) + "deg", "--hue": hue + "deg", "--offset": size*0.43 + 'px', size: size}}/>
+      <HueIndicator
+        style={{
+          '--degrees': hue - 90 + 'deg',
+          '--hue': hue + 'deg',
+          '--offset': size * 0.43 + 'px',
+          size: size,
+        }}
+      />
       <HueWheelBlockerWrapper>
         <dt>Hue</dt>
         <dd>{hue} degrees</dd>
@@ -70,7 +122,6 @@ const HueIndicator = styled.div`
   transform-origin: center;
   box-shadow: white 0px 0px 0px 2px inset;
 `;
-
 
 const HueWheelBlockerWrapper = styled.dl`
   height: calc(var(--size) - 0.25 * var(--size));
@@ -93,6 +144,7 @@ const HueWheelWrapper = styled.div`
   width: var(--size);
   border-radius: 50%;
   box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.25);
+  touch-action: none;
   background: rgba(0, 0, 0, 0)
     conic-gradient(
       rgb(255, 0, 0),

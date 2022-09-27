@@ -24,6 +24,23 @@ export const SaturationLightnessBox = ({size}: {size: number}) => {
     setHSL(null, Math.round(s * 100), Math.round(l * 100));
   };
 
+  const setSaturationLightnessFromTouch = (
+    event: React.TouchEvent<HTMLDivElement>
+  ) => {
+    const { clientX, clientY } = event.touches[0];
+    const { left, top, width, height } =
+      event.currentTarget.getBoundingClientRect();
+    // if mouse is outside of the box, return early
+    if (clientX < left || clientX > left + width || clientY < top || clientY > top + height) {
+      return;
+    }
+    const x = clientX - left;
+    const y = clientY - top;
+    const s = x / width;
+    const l = 1 - y / height;
+    setHSL(null, Math.round(s * 100), Math.round(l * 100));
+  };
+
   const mouseDownEvent = (event: React.MouseEvent<HTMLDivElement>) => {
     setMouseDown(true);
     console.log("mouse down");
@@ -38,15 +55,37 @@ export const SaturationLightnessBox = ({size}: {size: number}) => {
   const mouseMoveEvent = (event: React.MouseEvent<HTMLDivElement>) => {
     if (mouseDown) {
       console.log("mouse move");
+      event.preventDefault();
       setSaturationLightnessFromMouse(event);
     }
+  };
+
+  const touchStartEvent = (event: React.TouchEvent<HTMLDivElement>) => {
+    setMouseDown(true);
+    console.log("touch start");
+    setSaturationLightnessFromTouch(event);
+  };
+
+  const touchMoveEvent = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (mouseDown) {
+      console.log("touch move");
+      setSaturationLightnessFromTouch(event);
+    }
+  };
+
+  const touchEndEvent = (event: React.TouchEvent<HTMLDivElement>) => {
+    setMouseDown(false);
+    console.log("touch end");
   };
 
   return (
     <BoxWrapper
       onMouseDown={mouseDownEvent}
+      onTouchStart={touchStartEvent}
       onMouseUp={mouseUpEvent}
+      onTouchEnd={touchEndEvent}
       onMouseMove={mouseMoveEvent}
+      onTouchMove={touchMoveEvent}
       style={{"--size": size + 'px'}}
     >
       <SaturationLightnessIndicator  style={{ "--hue": hue + "deg", "--saturation": saturation + "%", "--lightness": lightness + "%" }}/>
@@ -76,6 +115,7 @@ const BoxWrapper = styled.div`
   position: relative;
   border: 2px solid black;
   box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.25);
+  touch-action: none;
 `;
 
 const SaturationFilter = styled.div`
