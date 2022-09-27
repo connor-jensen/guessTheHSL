@@ -166,7 +166,7 @@ function App({}) {
             targetHSL={targetHSL}
             showAnswer={answerRevealed}
           />
-          <RoundHistory historyColors={historyHSL} />
+          {/* <RoundHistory historyColors={historyHSL} /> */}
           <NumberControls
             currentHSL={{
               hue: hue,
@@ -175,8 +175,8 @@ function App({}) {
             }}
           />
           <HSLSelectorWrapper>
-            <HueWheel size={175} />
-            <SaturationLightnessBox size={175} />
+            <HueWheel size={150} />
+            <SaturationLightnessBox size={150} />
           </HSLSelectorWrapper>
           {!answerRevealed && (
             <SubmitButton

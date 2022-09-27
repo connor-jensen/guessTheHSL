@@ -72,7 +72,7 @@ const Button = styled.button`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 6px 22px;
+  padding: 4px 20px;
   border-radius: 8px;
   border: none;
   box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.18);
@@ -96,7 +96,7 @@ const ControlWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: 16px;
 `;
 
