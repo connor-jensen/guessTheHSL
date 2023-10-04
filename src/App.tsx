@@ -158,7 +158,7 @@ function App({}) {
             currentScore={score}
             bestScore={maxScore}
           />
-          <Timer totalTime={30} timeRemaining={20} />
+          {/* <Timer totalTime={30} timeRemaining={20} /> */}
           <ColorDisplay
             currentHSL={{
               hue: hue,
